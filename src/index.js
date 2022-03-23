@@ -17,25 +17,62 @@ app.use(cors())
 
 let onlineUsers = []
 
-io.on("connection", socket => {
+io.on("connect", socket => {
     console.log(socket.id)
 
-    socket.on("login", (user) => {
-        console.log("username -" + user.username)
-        user = {...user, id: uuid(), createdAt: new Date()}
-        console.log(user)
-        onlineUsers.push(user)
+    socket.on("setUsername", ({username, room}) => {
+        console.log("username -" + username)
+        // user = {...user, id: uuid(), createdAt: new Date()}
+        console.log(room)
+        onlineUsers =
+        onlineUsers.filter(user => user.username !== username)
+        .concat({
+            username,
+            id: socket.id,
+            sendAt : new Date(),
+            room
+        })
+
+        console.log("socket.id", socket.id , "room", room)
+        socket.join(room)
+
+        socket.emit("loggedin")
+    
+        socket.broadcast.emit("newConnection")
     })
 
-    socket.on("sendmessage", ({message}) => {
+
+    
+    
+    socket.on("sendmessage", ({message, room}) => {
         console.log("message - " + message)
-    })
+       socket.to(room).emit("message",message)
+        // socket.broadcast.emit("message",message)
 
+
+    })
+    
+    socket.on("openChatWith", ({ recipientId, sender }) => {
+        console.log("here")
+        socket.join(recipientId)
+        socket.to(recipientId).emit("message", { sender, text: "Hello, I'd like to chat with you" })
+    })
+    
+    socket.on("disconnect", () => {
+        console.log("Disconnected socket with id " + socket.id)
+    
+        onlineUsers = onlineUsers.filter(user => user.id !== socket.id)
+    
+        socket.broadcast.emit("newConnection")
+    })
 })
 
-app.get("/onlineUsers", (req, res) => {
+
+
+
+app.get("/online-users", (req, res) => {
     res.send({onlineUsers})
-    onlineUsers.push(username)
+    
 })
 
 server.listen(PORT, () => {
