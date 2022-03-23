@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon -e js nodemon/config .src/index.js"
+    "dev": "nodemon -e js nodemon/config ./src/index.js"
   },
   "repository": {
     "type": "git",
@@ -20,11 +20,13 @@
   },
   "homepage": "https://github.com/rajibjonchhen/m8-d8-messenger#readme",
   "devDependencies": {
+    "dotenv": "^16.0.0",
     "nodemon": "^2.0.15"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "socket.io": "^4.4.1"
+    "socket.io": "^4.4.1",
+    "uuid": "^8.3.2"
   }
 }
